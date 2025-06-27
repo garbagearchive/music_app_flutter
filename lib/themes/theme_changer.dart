@@ -18,9 +18,9 @@ class ThemeProvider extends ChangeNotifier {
 
   void toogleTheme() {
     if (_themeData == lightMode) {
-      themeData == darkMode;
+      _themeData == darkMode;
     } else {
-      (themeData == lightMode);
+      (_themeData == lightMode);
     }
   }
 }

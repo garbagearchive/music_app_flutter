@@ -19,7 +19,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
     playListProvider = Provider.of<PlaylistProvider>(context, listen: false);
   }
 
@@ -37,7 +36,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(title: const Text('P L A Y L I S T ')),
+      appBar: AppBar(title: const Text('P L A Y L I S T')),
       drawer:
           const AppDrawer(), //the drawer button (top left corner), add more function go to app_drawer.dart
       body: Consumer<PlaylistProvider>(

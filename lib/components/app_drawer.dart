@@ -33,6 +33,21 @@ class AppDrawer extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(left: 20, top: 25),
             child: ListTile(
+              title: Text('ADD PLAYLIST'),
+              leading: Icon(Icons.playlist_add),
+              onTap: () => {
+                Navigator.pop(context), //same shit as above
+                //redirect to setting page (setting_page.dart)
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SettingsPage()),
+                ),
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 20, top: 25),
+            child: ListTile(
               title: Text('SETTING'),
               leading: Icon(Icons.settings),
               onTap: () => {
@@ -43,6 +58,14 @@ class AppDrawer extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => SettingsPage()),
                 ),
               },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 20, top: 25),
+            child: ListTile(
+              title: Text('ACCOUNT'),
+              leading: Icon(Icons.contacts),
+              onTap: () => {},
             ),
           ),
         ],
