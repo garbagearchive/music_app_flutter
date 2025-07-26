@@ -16,11 +16,12 @@ class ThemeProvider extends ChangeNotifier {
     notifyListeners(); //update UI
   }
 
-  void toogleTheme() {
+  void toggleTheme() {
     if (_themeData == lightMode) {
-      _themeData == darkMode;
+      _themeData = darkMode;
     } else {
-      (_themeData == lightMode);
+      (_themeData = lightMode);
     }
+    notifyListeners();
   }
 }

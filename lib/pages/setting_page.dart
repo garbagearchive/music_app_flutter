@@ -20,17 +20,18 @@ class SettingsPage extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            //this is toogle light/dark mode button
-            Text('Switch theme', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text(
+              'Switch theme',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             CupertinoSwitch(
-              value: Provider.of<ThemeProvider>(
-                context,
-                listen: false,
-              ).isDarkMode,
-              onChanged: (value) => Provider.of<ThemeProvider>(
-                context,
-                listen: false,
-              ).toogleTheme(),
+              value: Provider.of<ThemeProvider>(context).isDarkMode,
+              onChanged: (value) {
+                Provider.of<ThemeProvider>(
+                  context,
+                  listen: false,
+                ).toggleTheme();
+              },
             ),
           ],
         ),
