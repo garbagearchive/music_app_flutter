@@ -1,19 +1,12 @@
-# music_app
+### MUSIC_APP_FLUTTER
 
-A new music app Flutter project
+## A mobile music streaming app using flutter for frontend and Springboot for backend
 
-Currently being maintained and developed and now the music app is only supported to run locally
-What we've done:
->Display album images, song names, artists
->Navigate with audio: choose a specific timestamp, skip to next/prev songs
->Choose what song to play in a playlist
->Dark theme
-
-What we're working on:
->Let the app runs on  server
->Search for songs/artists
->More options for setting
->Fix some functions
-
+#Features:
+- Playlist at frontpage
+- Setting in drawer (top left corner)
+- Play/Pause song, move to the next/previous song
+- Only play locally stored songs
+- Dark/Light theme (fixing)
 
 
