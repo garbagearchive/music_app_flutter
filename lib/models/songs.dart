@@ -4,6 +4,7 @@ class Song {
   final String artistName;
   final String albumImage;
   final String audioPath;
+  final String genre; // <--- THÊM TRƯỜNG NÀY
   //final String songAlbum;
   //final String songLyrics; (?)
 
@@ -12,6 +13,7 @@ class Song {
     required this.artistName,
     required this.albumImage,
     required this.audioPath,
+    required this.genre, // <--- THÊM VÀO CONSTRUCTOR
     //required this.songAlbum,
     //required this.songLyrics;
   });
