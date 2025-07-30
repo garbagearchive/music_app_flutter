@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:music_app/components/small_playing_widget.dart';
 import 'package:music_app/models/playlist_provider.dart';
 import 'package:music_app/models/songs.dart';
+import 'package:music_app/pages/search_page.dart';
 import 'package:music_app/pages/setting_page.dart';
 import 'package:music_app/pages/song_page.dart';
 import 'package:provider/provider.dart';
@@ -95,9 +97,7 @@ class _HomePageState extends State<HomePage> {
           },
         );
       case 1: // SEARCH
-        return const Center(
-          child: Text('Search Page', style: TextStyle(fontSize: 20)),
-        );
+        return const MusicSearchScreen();
       case 2: // SETTING
         return const SettingsPage();
       case 3: // ACCOUNT
@@ -114,13 +114,25 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        title: Center(child: const Text('M Y  M U S I C  A P P')),
+        title: const Center(child: Text('M Y  M U S I C  A P P')),
         titleTextStyle: TextStyle(
           fontWeight: FontWeight.bold,
           color: Theme.of(context).colorScheme.inversePrimary,
         ),
       ),
-      body: _getBody(),
+      body: Column(
+        children: [
+          Expanded(child: _getBody()),
+          NowPlayingWidget(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SongPage()),
+              );
+            },
+          ),
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onBottomNavTap,
