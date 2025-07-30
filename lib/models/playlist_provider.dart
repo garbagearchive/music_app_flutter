@@ -14,6 +14,7 @@ class PlaylistProvider extends ChangeNotifier {
       artistName: 'Cursedsnake',
       albumImage: 'assets/images/calm_img.png',
       audioPath: 'audio/Calm.mp3',
+      genre: 'Jazz', // Thể loại mới
     ),
     //index 1
     Song(
@@ -21,18 +22,28 @@ class PlaylistProvider extends ChangeNotifier {
       artistName: '8bitPice',
       albumImage: 'assets/images/feel_img.png',
       audioPath: 'audio/Feel.mp3',
+      genre: 'EDM', // Thể loại mới
     ),
     Song(
       songName: 'Unity',
       artistName: 'TheFatRat',
       albumImage: 'assets/images/Unity_img.png',
       audioPath: 'audio/Unity.mp3',
+      genre: 'EDM', // Thể loại mới
     ),
     Song(
       songName: 'Invisible',
       artistName: 'Duran Duran',
       albumImage: 'assets/images/invisible.png',
       audioPath: 'audio/Invisible.mp3',
+      genre: 'Pop', // Thể loại mới
+    ),
+    Song(
+      songName: 'Tuyen ngon doc lap',
+      artistName: 'Ho Chi Minh',
+      albumImage: 'assets/images/image00.png',
+      audioPath: 'audio/Tndl.mp3',
+      genre: 'Speaking Audio', // Thể loại mới
     ),
   ];
   /*AUDIOPLAYER 
