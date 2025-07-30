@@ -50,6 +50,44 @@ class _HomePageState extends State<HomePage> {
                   title: Text(song.songName),
                   subtitle: Text(song.artistName),
                   leading: Image.asset(song.albumImage),
+                  trailing: PopupMenuButton<String>(
+                    onSelected: (value) {
+                      switch (value) {
+                        case 'favorite':
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                '${song.songName} added to favorites',
+                              ),
+                            ),
+                          );
+                          break;
+
+                        case 'remove':
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                '${song.songName} removed from playlist',
+                              ),
+                            ),
+                          );
+                          break;
+
+                        default:
+                          break;
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(
+                        value: 'favorite',
+                        child: Text('Add to Favorites'),
+                      ),
+                      const PopupMenuItem(
+                        value: 'remove',
+                        child: Text('Remove from playlist'),
+                      ),
+                    ],
+                  ),
                   onTap: () => goToSong(index),
                 );
               },

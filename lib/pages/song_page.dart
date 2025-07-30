@@ -32,154 +32,180 @@ class SongPage extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.only(left: 25, right: 25, bottom: 25),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  //app bar
+                  // App Bar Row at the top
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      //back button
                       IconButton(
                         onPressed: () => Navigator.pop(context),
                         icon: const Icon(Icons.arrow_back),
                       ),
-                      //title
-                      Text('NOW PLAYING'),
-                      //menu button
-                      IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.menu),
+                      Expanded(
+                        child: Center(
+                          child: Text(
+                            'NOW PLAYING',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
                       ),
+                      const SizedBox(width: 48), // Balance space
                     ],
                   ),
-                  //album image
-                  NeuBox(
-                    child: Column(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.asset(currentSong.albumImage),
-                        ),
-                        //song and artist name
-                        Padding(
-                          padding: const EdgeInsetsGeometry.all(16),
-                          child: Row(
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    currentSong.songName,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
-                                    ),
+
+                  const SizedBox(height: 20),
+
+                  // Main content scrollable in case of small screen
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          // Album image and song info
+                          NeuBox(
+                            child: Column(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.asset(currentSong.albumImage),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Row(
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            currentSong.songName,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 20,
+                                            ),
+                                          ),
+                                          Text(currentSong.artistName),
+                                        ],
+                                      ),
+                                    ],
                                   ),
-                                  Text(currentSong.artistName),
-                                ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 100),
+
+                          // Duration and slider
+                          Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 25,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(formatTime(value.currentDuration)),
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.shuffle,
+                                        color: value.isShuffle
+                                            ? Colors.blue
+                                            : Colors.grey,
+                                      ),
+                                      onPressed: value.toggleShuffle,
+                                    ),
+                                    IconButton(
+                                      icon: Icon(
+                                        value.isRepeat
+                                            ? Icons.repeat_one
+                                            : Icons.repeat,
+                                        color: value.isRepeat
+                                            ? Colors.blue
+                                            : Colors.grey,
+                                      ),
+                                      onPressed: value.toggleRepeat,
+                                    ),
+                                    Text(formatTime(value.totalDuration)),
+                                  ],
+                                ),
+                              ),
+                              SliderTheme(
+                                data: SliderTheme.of(context).copyWith(
+                                  thumbShape: const RoundSliderThumbShape(
+                                    enabledThumbRadius: 6,
+                                  ),
+                                  overlayShape: const RoundSliderOverlayShape(
+                                    overlayRadius: 12,
+                                  ),
+                                  activeTrackColor: Colors.blueAccent,
+                                  inactiveTrackColor: Colors.grey[300],
+                                  thumbColor: Colors.blueAccent,
+                                  trackHeight: 4,
+                                ),
+                                child: Slider(
+                                  min: 0,
+                                  max: value.totalDuration.inSeconds
+                                      .toDouble()
+                                      .clamp(1.0, double.infinity),
+                                  value: value.currentDuration.inSeconds
+                                      .clamp(0, value.totalDuration.inSeconds)
+                                      .toDouble(),
+                                  onChanged: (position) {
+                                    value.seek(
+                                      Duration(seconds: position.toInt()),
+                                    );
+                                  },
+                                  onChangeEnd: (position) {
+                                    value.seek(
+                                      Duration(seconds: position.toInt()),
+                                    );
+                                  },
+                                ),
                               ),
                             ],
                           ),
-                        ),
-                      ],
+
+                          const SizedBox(height: 25),
+
+                          // Playback control
+                          Row(
+                            children: [
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: value.playPreviousSong,
+                                  child: const NeuBox(
+                                    child: Icon(Icons.skip_previous),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 20),
+                              Expanded(
+                                flex: 2,
+                                child: GestureDetector(
+                                  onTap: value.pauseOrResume,
+                                  child: NeuBox(
+                                    child: Icon(
+                                      value.isPlaying
+                                          ? Icons.pause
+                                          : Icons.play_arrow,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 20),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: value.playNextSong,
+                                  child: const NeuBox(
+                                    child: Icon(Icons.skip_next),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 25),
-                  //song duration
-                  Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 25),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            // Start time
-                            Text(formatTime(value.currentDuration)),
-
-                            // Shuffle Button
-                            IconButton(
-                              icon: Icon(
-                                Icons.shuffle,
-                                color: value.isShuffle
-                                    ? Colors.blue
-                                    : Colors.grey,
-                              ),
-                              onPressed: () {
-                                value.toggleShuffle();
-                              },
-                            ),
-
-                            // Repeat Button
-                            IconButton(
-                              icon: Icon(
-                                value.isRepeat
-                                    ? Icons.repeat_one
-                                    : Icons.repeat,
-                                color: value.isRepeat
-                                    ? Colors.blue
-                                    : Colors.grey,
-                              ),
-                              onPressed: () {
-                                value.toggleRepeat();
-                              },
-                            ),
-
-                            // End time
-                            Text(formatTime(value.totalDuration)),
-                          ],
-                        ),
-                      ),
-                      SliderTheme(
-                        data: SliderTheme.of(context).copyWith(
-                          thumbShape: const RoundSliderThumbShape(
-                            enabledThumbRadius: 0,
-                          ),
-                        ),
-                        child: Slider(
-                          min: 0,
-                          max: value.totalDuration.inSeconds.toDouble(),
-                          value: value.currentDuration.inSeconds.toDouble(),
-                          activeColor: Colors.blueAccent,
-                          onChanged: (double double) {},
-                          onChangeEnd: (double double) {
-                            value.seek(Duration(seconds: double.toInt()));
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 25), //playback control
-                  Row(
-                    children: [
-                      //skip previous
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: value.playPreviousSong,
-                          child: const NeuBox(child: Icon(Icons.skip_previous)),
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      //play pause
-                      Expanded(
-                        flex: 2,
-                        child: GestureDetector(
-                          onTap: value.pauseOrResume,
-                          child: NeuBox(
-                            child: Icon(
-                              value.isPlaying ? Icons.pause : Icons.play_arrow,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      //skip forward
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: value.playNextSong,
-                          child: const NeuBox(child: Icon(Icons.skip_next)),
-                        ),
-                      ),
-                    ],
                   ),
                 ],
               ),
