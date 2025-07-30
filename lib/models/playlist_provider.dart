@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:music_app/models/songs.dart';
@@ -49,6 +51,8 @@ class PlaylistProvider extends ChangeNotifier {
 
   //when not playing
   bool _isPlaying = false;
+  bool _isShuffle = false;
+  bool _isRepeat = false;
 
   //when playing
   void play() async {
@@ -88,14 +92,27 @@ class PlaylistProvider extends ChangeNotifier {
     await _audioPlayer.seek(position);
   }
 
-  //play next song
   void playNextSong() {
-    if (_currentSongIndex != null) {
-      if (_currentSongIndex! < _playList.length - 1) {
-        //go to next song if its not the last
-        currentSongIndex = _currentSongIndex! + 1;
-      } else {
-        currentSongIndex = 0;
+    if (_isRepeat) {
+      // Repeat current song
+      seek(Duration.zero);
+      play();
+    } else if (_isShuffle) {
+      // Play a random song (not the same as current)
+      final random = Random();
+      int nextIndex;
+      do {
+        nextIndex = random.nextInt(_playList.length);
+      } while (nextIndex == _currentSongIndex);
+      currentSongIndex = nextIndex;
+    } else {
+      // Play next song normally
+      if (_currentSongIndex != null) {
+        if (_currentSongIndex! < _playList.length - 1) {
+          currentSongIndex = _currentSongIndex! + 1;
+        } else {
+          currentSongIndex = 0; // loop back to first song
+        }
       }
     }
   }
@@ -111,6 +128,16 @@ class PlaylistProvider extends ChangeNotifier {
         currentSongIndex = _playList.length - 1;
       }
     }
+  }
+
+  void toggleRepeat() {
+    _isRepeat = !_isRepeat;
+    notifyListeners();
+  }
+
+  void toggleShuffle() {
+    _isShuffle = !_isShuffle;
+    notifyListeners();
   }
 
   //listen to duration
@@ -139,6 +166,8 @@ class PlaylistProvider extends ChangeNotifier {
   List<Song> get playList => _playList;
   int? get currentSongIndex => _currentSongIndex;
   bool get isPlaying => _isPlaying;
+  bool get isRepeat => _isRepeat;
+  bool get isShuffle => _isShuffle;
   Duration get currentDuration => _currentDuration;
   Duration get totalDuration => _totalDuration;
 

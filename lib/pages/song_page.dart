@@ -44,7 +44,7 @@ class SongPage extends StatelessWidget {
                         icon: const Icon(Icons.arrow_back),
                       ),
                       //title
-                      Text('P L A Y L I S T'),
+                      Text('NOW PLAYING'),
                       //menu button
                       IconButton(
                         onPressed: () {},
@@ -93,13 +93,38 @@ class SongPage extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            //start time
+                            // Start time
                             Text(formatTime(value.currentDuration)),
-                            //shuffle songs
-                            Icon(Icons.shuffle),
-                            //repeat
-                            Icon(Icons.repeat),
-                            //end of the song
+
+                            // Shuffle Button
+                            IconButton(
+                              icon: Icon(
+                                Icons.shuffle,
+                                color: value.isShuffle
+                                    ? Colors.blue
+                                    : Colors.grey,
+                              ),
+                              onPressed: () {
+                                value.toggleShuffle();
+                              },
+                            ),
+
+                            // Repeat Button
+                            IconButton(
+                              icon: Icon(
+                                value.isRepeat
+                                    ? Icons.repeat_one
+                                    : Icons.repeat,
+                                color: value.isRepeat
+                                    ? Colors.blue
+                                    : Colors.grey,
+                              ),
+                              onPressed: () {
+                                value.toggleRepeat();
+                              },
+                            ),
+
+                            // End time
                             Text(formatTime(value.totalDuration)),
                           ],
                         ),
@@ -114,7 +139,7 @@ class SongPage extends StatelessWidget {
                           min: 0,
                           max: value.totalDuration.inSeconds.toDouble(),
                           value: value.currentDuration.inSeconds.toDouble(),
-                          activeColor: Colors.lime,
+                          activeColor: Colors.blueAccent,
                           onChanged: (double double) {},
                           onChangeEnd: (double double) {
                             value.seek(Duration(seconds: double.toInt()));
