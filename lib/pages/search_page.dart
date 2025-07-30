@@ -93,20 +93,36 @@ class _MusicSearchScreenState extends State<MusicSearchScreen> {
               // Search Bar
               TextField(
                 controller: _searchController,
+                style: TextStyle(
+                color: Theme.of(context).colorScheme.onBackground, // chữ trong chế độ tối
+              ),
                 decoration: InputDecoration(
-                  hintText: 'Tìm bài hát, nghệ sĩ...',
-                  prefixIcon: const Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0),
-                    borderSide: BorderSide.none,
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[200],
-                  contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
-                ),
-                onChanged: (value) {
-                  _filterSongs();
-                },
+                hintText: 'Tìm bài hát, nghệ sĩ...',
+                hintStyle: TextStyle(
+                color: Theme.of(context).hintColor,
+             ),
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: _searchController.text.isNotEmpty
+            ? IconButton(
+              icon: const Icon(Icons.clear),
+              onPressed: () {
+              _searchController.clear(); // xóa nội dung
+              _filterSongs(); // cập nhật lại danh sách
+              FocusScope.of(context).unfocus(); // ẩn bàn phím
+              },
+                )
+              : null,
+      border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(30.0),
+      borderSide: BorderSide.none,
+    ),
+    filled: true,
+    fillColor: Theme.of(context).brightness == Brightness.dark
+        ? Colors.grey[800]
+        : Colors.grey[200],
+    contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
+  ),
+  onChanged: (value) => _filterSongs(),
               ),
               const SizedBox(height: 16),
 
@@ -131,9 +147,14 @@ class _MusicSearchScreenState extends State<MusicSearchScreen> {
                         },
                         items: <String?>[null, ...availableGenres].map<DropdownMenuItem<String>>(
                           (String? value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value ?? 'Tất cả'),
+                          return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(
+                        value ?? 'Tất cả',
+                        style: TextStyle(
+                        color: Theme.of(context).colorScheme.onBackground, // màu chữ dropdown
+                              ),
+                                    ),
                             );
                           },
                         ).toList(),
