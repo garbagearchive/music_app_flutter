@@ -9,7 +9,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
-        ChangeNotifierProvider(create: (context) => PlaylistProvider()), // Ensure PlaylistProvider is provided
+        ChangeNotifierProvider(create: (context) => PlaylistProvider()),
       ],
       child: const MyApp(),
     ),

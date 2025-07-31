@@ -39,7 +39,10 @@ class _MusicSearchScreenState extends State<MusicSearchScreen> {
   }
 
   void _filterSongs() {
-    final allSongs = Provider.of<PlaylistProvider>(context, listen: false).playList;
+    final allSongs = Provider.of<PlaylistProvider>(
+      context,
+      listen: false,
+    ).playList;
 
     setState(() {
       final query = _searchController.text.toLowerCase();
@@ -47,24 +50,32 @@ class _MusicSearchScreenState extends State<MusicSearchScreen> {
 
       // Lọc theo thể loại nếu một thể loại cụ thể được chọn (_selectedGenre không phải null)
       if (_selectedGenre != null) {
-        results = results.where((song) => song.genre == _selectedGenre).toList();
+        results = results
+            .where((song) => song.genre == _selectedGenre)
+            .toList();
       }
 
       // Lọc theo từ khóa tìm kiếm nếu có từ khóa (query không rỗng)
       if (query.isNotEmpty) {
-        results = results.where(
-          (song) => song.songName.toLowerCase().contains(query) || song.artistName.toLowerCase().contains(query)
-        ).toList();
+        results = results
+            .where(
+              (song) =>
+                  song.songName.toLowerCase().contains(query) ||
+                  song.artistName.toLowerCase().contains(query),
+            )
+            .toList();
       }
-      
+
       // Gán kết quả cuối cùng vào _filteredSongs
       _filteredSongs = results;
     });
   }
 
-
   void _updateRecommendations() {
-    final allSongs = Provider.of<PlaylistProvider>(context, listen: false).playList;
+    final allSongs = Provider.of<PlaylistProvider>(
+      context,
+      listen: false,
+    ).playList;
     List<Song> sortedSongs = List.from(allSongs);
     sortedSongs.sort((a, b) => a.songName.compareTo(b.songName));
     _recommendedSongs = sortedSongs.take(3).toList();
@@ -74,16 +85,12 @@ class _MusicSearchScreenState extends State<MusicSearchScreen> {
   Widget build(BuildContext context) {
     final playlistProvider = Provider.of<PlaylistProvider>(context);
 
-    final List<String> availableGenres = playlistProvider.playList
-        .map((song) => song.genre)
-        .toSet()
-        .toList()
-        ..sort();
+    final List<String> availableGenres =
+        playlistProvider.playList.map((song) => song.genre).toSet().toList()
+          ..sort();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tìm kiếm bài hát'),
-      ),
+      appBar: AppBar(title: const Text('Tìm kiếm bài hát')),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -94,7 +101,7 @@ class _MusicSearchScreenState extends State<MusicSearchScreen> {
               TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  hintText: 'Tìm bài hát, nghệ sĩ...',
+                  hintText: 'Looking for songs, artist...',
                   prefixIcon: const Icon(Icons.search),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30.0),
@@ -102,7 +109,10 @@ class _MusicSearchScreenState extends State<MusicSearchScreen> {
                   ),
                   filled: true,
                   fillColor: Colors.grey[200],
-                  contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 0,
+                    horizontal: 20,
+                  ),
                 ),
                 onChanged: (value) {
                   _filterSongs();
@@ -122,45 +132,54 @@ class _MusicSearchScreenState extends State<MusicSearchScreen> {
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
                         value: _selectedGenre,
-                        hint: const Text('Thể loại'),
+                        hint: const Text('Genre'),
                         onChanged: (String? newValue) {
                           setState(() {
                             _selectedGenre = newValue;
                           });
                           _filterSongs();
                         },
-                        items: <String?>[null, ...availableGenres].map<DropdownMenuItem<String>>(
-                          (String? value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value ?? 'Tất cả'),
-                            );
-                          },
-                        ).toList(),
+                        items: <String?>[null, ...availableGenres]
+                            .map<DropdownMenuItem<String>>((String? value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value ?? 'All'),
+                              );
+                            })
+                            .toList(),
                       ),
                     ),
                   ),
                   const SizedBox(width: 8),
 
                   ActionChip(
-                    label: const Text('Đang phát'),
+                    label: const Text('Now Playing'),
                     onPressed: () {
-                      if (playlistProvider.isPlaying && playlistProvider.currentSongIndex != null) {
+                      if (playlistProvider.isPlaying &&
+                          playlistProvider.currentSongIndex != null) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                              'Đang phát: ${playlistProvider.playList[playlistProvider.currentSongIndex!].songName}'
+                              'Now playing: ${playlistProvider.playList[playlistProvider.currentSongIndex!].songName}',
                             ),
                           ),
                         );
                       } else {
-                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Không có bài hát nào đang phát.')),
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('No song is playing currently.'),
+                          ),
                         );
                       }
                     },
-                    backgroundColor: playlistProvider.isPlaying ? Colors.green[100] : Colors.grey[200],
-                    labelStyle: TextStyle(color: playlistProvider.isPlaying ? Colors.green : Colors.black),
+                    backgroundColor: playlistProvider.isPlaying
+                        ? Colors.green[100]
+                        : Colors.grey[200],
+                    labelStyle: TextStyle(
+                      color: playlistProvider.isPlaying
+                          ? Colors.green
+                          : Colors.black,
+                    ),
                   ),
                 ],
               ),
@@ -168,7 +187,7 @@ class _MusicSearchScreenState extends State<MusicSearchScreen> {
 
               // Search Results Section
               const Text(
-                'Kết quả tìm kiếm',
+                'Result',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
@@ -176,26 +195,35 @@ class _MusicSearchScreenState extends State<MusicSearchScreen> {
                   ? Center(
                       child: Text(
                         // Sửa lại thông báo cho phù hợp
-                        (_searchController.text.isEmpty && _selectedGenre == null)
-                            ? 'Chọn thể loại hoặc nhập từ khóa để tìm kiếm.'
-                            : 'Không tìm thấy bài hát nào phù hợp.',
+                        (_searchController.text.isEmpty &&
+                                _selectedGenre == null)
+                            ? 'Select gerne and keywords'
+                            : 'Nothing found.',
                         style: const TextStyle(color: Colors.grey),
                       ),
                     )
                   : GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 10.0,
-                        mainAxisSpacing: 10.0,
-                        childAspectRatio: 0.9,
-                      ),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 10.0,
+                            mainAxisSpacing: 10.0,
+                            childAspectRatio: 0.9,
+                          ),
                       itemCount: _filteredSongs.length,
                       itemBuilder: (context, index) {
                         final song = _filteredSongs[index];
-                        final originalIndex = playlistProvider.playList.indexOf(song);
-                        return _buildSongCard(song.albumImage, song.songName, song.artistName, originalIndex);
+                        final originalIndex = playlistProvider.playList.indexOf(
+                          song,
+                        );
+                        return _buildSongCard(
+                          song.albumImage,
+                          song.songName,
+                          song.artistName,
+                          originalIndex,
+                        );
                       },
                     ),
 
@@ -203,7 +231,7 @@ class _MusicSearchScreenState extends State<MusicSearchScreen> {
 
               // Recommendations Section
               const Text(
-                'Đề xuất cho bạn',
+                'Recommendation',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
@@ -214,10 +242,17 @@ class _MusicSearchScreenState extends State<MusicSearchScreen> {
                   itemCount: _recommendedSongs.length,
                   itemBuilder: (context, index) {
                     final song = _recommendedSongs[index];
-                    final originalIndex = playlistProvider.playList.indexOf(song);
+                    final originalIndex = playlistProvider.playList.indexOf(
+                      song,
+                    );
                     return Padding(
                       padding: const EdgeInsets.only(right: 16.0),
-                      child: _buildSongCard(song.albumImage, song.songName, song.artistName, originalIndex),
+                      child: _buildSongCard(
+                        song.albumImage,
+                        song.songName,
+                        song.artistName,
+                        originalIndex,
+                      ),
                     );
                   },
                 ),
@@ -230,13 +265,21 @@ class _MusicSearchScreenState extends State<MusicSearchScreen> {
     );
   }
 
-  Widget _buildSongCard(String imageUrl, String title, String artist, int songIndex) {
-    final playlistProvider = Provider.of<PlaylistProvider>(context, listen: false);
+  Widget _buildSongCard(
+    String imageUrl,
+    String title,
+    String artist,
+    int songIndex,
+  ) {
+    final playlistProvider = Provider.of<PlaylistProvider>(
+      context,
+      listen: false,
+    );
     return GestureDetector(
       onTap: () {
         playlistProvider.currentSongIndex = songIndex;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Đang phát: $title - $artist')),
+          SnackBar(content: Text('Now playing: $title - $artist')),
         );
       },
       child: Column(
@@ -254,7 +297,11 @@ class _MusicSearchScreenState extends State<MusicSearchScreen> {
                   width: 150,
                   height: 150,
                   color: Colors.grey[300],
-                  child: const Icon(Icons.music_note, size: 50, color: Colors.grey),
+                  child: const Icon(
+                    Icons.music_note,
+                    size: 50,
+                    color: Colors.grey,
+                  ),
                 );
               },
             ),
