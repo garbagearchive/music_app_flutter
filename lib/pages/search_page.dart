@@ -100,8 +100,13 @@ class _MusicSearchScreenState extends State<MusicSearchScreen> {
               // Search Bar
               TextField(
                 controller: _searchController,
+                style: TextStyle(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onBackground, // chữ trong chế độ tối
+                ),
                 decoration: InputDecoration(
-                  hintText: 'Looking for songs, artist...',
+                  hintText: 'Tìm bài hát, nghệ sĩ...',
                   prefixIcon: const Icon(Icons.search),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30.0),
@@ -143,7 +148,7 @@ class _MusicSearchScreenState extends State<MusicSearchScreen> {
                             .map<DropdownMenuItem<String>>((String? value) {
                               return DropdownMenuItem<String>(
                                 value: value,
-                                child: Text(value ?? 'All'),
+                                child: Text(value ?? 'Tất cả'),
                               );
                             })
                             .toList(),
