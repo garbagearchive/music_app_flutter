@@ -90,7 +90,7 @@ class _MusicSearchScreenState extends State<MusicSearchScreen> {
           ..sort();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Tìm kiếm bài hát')),
+      appBar: AppBar(title: const Text('Search')),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -106,7 +106,7 @@ class _MusicSearchScreenState extends State<MusicSearchScreen> {
                   ).colorScheme.onBackground, // chữ trong chế độ tối
                 ),
                 decoration: InputDecoration(
-                  hintText: 'Tìm bài hát, nghệ sĩ...',
+                  hintText: 'Search for songs, artists...',
                   prefixIcon: const Icon(Icons.search),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30.0),
@@ -148,7 +148,7 @@ class _MusicSearchScreenState extends State<MusicSearchScreen> {
                             .map<DropdownMenuItem<String>>((String? value) {
                               return DropdownMenuItem<String>(
                                 value: value,
-                                child: Text(value ?? 'Tất cả'),
+                                child: Text(value ?? 'All'),
                               );
                             })
                             .toList(),
