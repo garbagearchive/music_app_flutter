@@ -52,7 +52,7 @@ class SongPage extends StatelessWidget {
                     ],
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 40),
 
                   // Main content scrollable in case of small screen
                   Expanded(

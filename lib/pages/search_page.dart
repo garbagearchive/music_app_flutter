@@ -103,7 +103,7 @@ class _MusicSearchScreenState extends State<MusicSearchScreen> {
                 style: TextStyle(
                   color: Theme.of(
                     context,
-                  ).colorScheme.onBackground, // chữ trong chế độ tối
+                  ).colorScheme.inversePrimary, // chữ trong chế độ tối
                 ),
                 decoration: InputDecoration(
                   hintText: 'Search for songs, artists...',
@@ -113,7 +113,7 @@ class _MusicSearchScreenState extends State<MusicSearchScreen> {
                     borderSide: BorderSide.none,
                   ),
                   filled: true,
-                  fillColor: Colors.grey[200],
+                  fillColor: Theme.of(context).colorScheme.primary,
                   contentPadding: const EdgeInsets.symmetric(
                     vertical: 0,
                     horizontal: 20,
@@ -130,7 +130,7 @@ class _MusicSearchScreenState extends State<MusicSearchScreen> {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.grey[200],
+                      color: Theme.of(context).colorScheme.primary,
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -148,7 +148,16 @@ class _MusicSearchScreenState extends State<MusicSearchScreen> {
                             .map<DropdownMenuItem<String>>((String? value) {
                               return DropdownMenuItem<String>(
                                 value: value,
-                                child: Text(value ?? 'All'),
+                                child: Builder(
+                                  builder: (context) => Text(
+                                    value ?? 'All',
+                                    style: TextStyle(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.inversePrimary,
+                                    ),
+                                  ),
+                                ),
                               );
                             })
                             .toList(),
@@ -179,11 +188,11 @@ class _MusicSearchScreenState extends State<MusicSearchScreen> {
                     },
                     backgroundColor: playlistProvider.isPlaying
                         ? Colors.green[100]
-                        : Colors.grey[200],
+                        : Theme.of(context).colorScheme.primary,
                     labelStyle: TextStyle(
                       color: playlistProvider.isPlaying
                           ? Colors.green
-                          : Colors.black,
+                          : Theme.of(context).colorScheme.inversePrimary,
                     ),
                   ),
                 ],
