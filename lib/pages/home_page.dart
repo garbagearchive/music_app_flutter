@@ -5,10 +5,13 @@ import 'package:music_app/models/songs.dart';
 import 'package:music_app/pages/search_page.dart';
 import 'package:music_app/pages/setting_page.dart';
 import 'package:music_app/pages/song_page.dart';
+import 'package:music_app/pages/account_page.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final String username;
+
+  const HomePage({super.key, required this.username});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -26,10 +29,29 @@ class _HomePageState extends State<HomePage> {
 
   void goToSong(int songIndex) {
     playListProvider.currentSongIndex = songIndex;
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const SongPage()),
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text(
+          '🎵 Now Playing...',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        duration: const Duration(seconds: 1),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: const Color(0xFF6A1B9A),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
+        elevation: 10,
+      ),
     );
+
+    Future.delayed(const Duration(milliseconds: 300), () {
+      Navigator.push(
+        // ignore: use_build_context_synchronously
+        context,
+        MaterialPageRoute(builder: (context) => const SongPage()),
+      );
+    });
   }
 
   void _onBottomNavTap(int index) {
@@ -40,7 +62,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _getBody() {
     switch (_selectedIndex) {
-      case 0: // HOME
+      case 0:
         return Consumer<PlaylistProvider>(
           builder: (context, value, child) {
             final List<Song> playList = value.playList;
@@ -52,58 +74,18 @@ class _HomePageState extends State<HomePage> {
                   title: Text(song.songName),
                   subtitle: Text(song.artistName),
                   leading: Image.asset(song.albumImage),
-                  trailing: PopupMenuButton<String>(
-                    onSelected: (value) {
-                      switch (value) {
-                        case 'favorite':
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                '${song.songName} added to favorites',
-                              ),
-                            ),
-                          );
-                          break;
-
-                        case 'remove':
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                '${song.songName} removed from playlist',
-                              ),
-                            ),
-                          );
-                          break;
-
-                        default:
-                          break;
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      const PopupMenuItem(
-                        value: 'favorite',
-                        child: Text('Add to Favorites'),
-                      ),
-                      const PopupMenuItem(
-                        value: 'remove',
-                        child: Text('Remove from playlist'),
-                      ),
-                    ],
-                  ),
                   onTap: () => goToSong(index),
                 );
               },
             );
           },
         );
-      case 1: // SEARCH
+      case 1:
         return const MusicSearchScreen();
-      case 2: // SETTING
+      case 2:
         return const SettingsPage();
-      case 3: // ACCOUNT
-        return const Center(
-          child: Text('Account Page', style: TextStyle(fontSize: 20)),
-        );
+      case 3:
+        return AccountPage(username: widget.username);
       default:
         return const Center(child: Text('Page Not Found'));
     }
@@ -113,35 +95,108 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        title: const Center(child: Text('M Y  M U S I C  A P P')),
-        titleTextStyle: TextStyle(
-          fontWeight: FontWeight.bold,
-          color: Theme.of(context).colorScheme.inversePrimary,
+
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color(0xFF00FFFF),
+                Color(0xFFFF00FF),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Center(
+              child: Text(
+                'M Y  M U S I C  A P P',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
         ),
       ),
+
       body: Column(
         children: [
           Expanded(child: _getBody()),
-          NowPlayingWidget(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SongPage()),
-              );
+          Consumer<PlaylistProvider>(
+            builder: (context, provider, child) {
+              return provider.currentSongIndex != null
+                  ? NowPlayingWidget(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const SongPage()),
+                        );
+                      },
+                    )
+                  : const SizedBox(); // Không hiển thị nếu chưa chọn bài
             },
           ),
         ],
       ),
+
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onBottomNavTap,
         type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'HOME'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'SEARCH'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'SETTING'),
-          BottomNavigationBarItem(icon: Icon(Icons.contacts), label: 'ACCOUNT'),
+        backgroundColor: Colors.black,
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.grey,
+        items: [
+          BottomNavigationBarItem(
+            icon: ShaderMask(
+              shaderCallback: (bounds) => const LinearGradient(
+                colors: [Color(0xFF00FFFF), Color(0xFFFF00FF)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ).createShader(bounds),
+              child: const Icon(Icons.home, color: Colors.white),
+            ),
+            label: 'HOME',
+          ),
+          BottomNavigationBarItem(
+            icon: ShaderMask(
+              shaderCallback: (bounds) => const LinearGradient(
+                colors: [Color(0xFF00FFFF), Color(0xFFFF00FF)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ).createShader(bounds),
+              child: const Icon(Icons.search, color: Colors.white),
+            ),
+            label: 'SEARCH',
+          ),
+          BottomNavigationBarItem(
+            icon: ShaderMask(
+              shaderCallback: (bounds) => const LinearGradient(
+                colors: [Color(0xFF00FFFF), Color(0xFFFF00FF)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ).createShader(bounds),
+              child: const Icon(Icons.settings, color: Colors.white),
+            ),
+            label: 'SETTING',
+          ),
+          BottomNavigationBarItem(
+            icon: ShaderMask(
+              shaderCallback: (bounds) => const LinearGradient(
+                colors: [Color(0xFF00FFFF), Color(0xFFFF00FF)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ).createShader(bounds),
+              child: const Icon(Icons.contacts, color: Colors.white),
+            ),
+            label: 'ACCOUNT',
+          ),
         ],
       ),
     );

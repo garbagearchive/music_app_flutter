@@ -1,46 +1,63 @@
 import 'package:flutter/material.dart';
-import 'package:music_app/pages/home_page.dart';
 import '../utils/validators.dart';
 import '../services/api_service.dart';
-//import 'home_page.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController usernameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
   final ValueNotifier<bool> _obscurePassword = ValueNotifier(true);
+  final ValueNotifier<bool> _obscureConfirmPassword = ValueNotifier(true);
 
-  Future<void> handleLogin() async {
+  bool hasUpperCase = false;
+  bool hasNumber = false;
+  bool hasSpecialChar = false;
+  bool hasMinLength = false;
+
+  @override
+  void initState() {
+    super.initState();
+    passwordController.addListener(_validatePasswordStrength);
+  }
+
+  void _validatePasswordStrength() {
+    final password = passwordController.text;
+    setState(() {
+      hasUpperCase = password.contains(RegExp(r'[A-Z]'));
+      hasNumber = password.contains(RegExp(r'[0-9]'));
+      hasSpecialChar = password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
+      hasMinLength = password.length >= 8;
+    });
+  }
+
+  Future<void> handleRegister() async {
     if (_formKey.currentState?.validate() != true) return;
 
-    final message = await ApiService.login(
-      usernameController.text.trim(),
-      passwordController.text.trim(),
-    );
-
-    // If successful login message
-    if (message.toLowerCase().contains("success")) {
-      Navigator.pushReplacement(
-        // ignore: use_build_context_synchronously
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              HomePage(username: usernameController.text.trim()),
-        ),
+    try {
+      final message = await ApiService.register(
+        usernameController.text.trim(),
+        emailController.text.trim(),
+        passwordController.text.trim(),
       );
-    } else {
-      // Otherwise show error message
       ScaffoldMessenger.of(
         // ignore: use_build_context_synchronously
         context,
       ).showSnackBar(SnackBar(content: Text(message)));
+    } catch (e) {
+      ScaffoldMessenger.of(
+        // ignore: use_build_context_synchronously
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 
@@ -83,6 +100,26 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  Widget _buildPasswordRequirement(String text, bool isValid) {
+    return Row(
+      children: [
+        Icon(
+          isValid ? Icons.check_circle : Icons.cancel,
+          color: isValid ? Colors.green : Colors.red,
+          size: 18,
+        ),
+        const SizedBox(width: 6),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 14,
+            color: isValid ? Colors.green : Colors.red,
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -110,7 +147,7 @@ class _LoginPageState extends State<LoginPage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       const Text(
-                        "Welcome Back",
+                        "Create Account",
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -120,7 +157,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(height: 10),
                       const Text(
-                        "Login to your account",
+                        "Register to get started",
                         style: TextStyle(fontSize: 16, color: Colors.grey),
                         textAlign: TextAlign.center,
                       ),
@@ -129,7 +166,14 @@ class _LoginPageState extends State<LoginPage> {
                         label: "Username",
                         icon: Icons.person_outline,
                         controller: usernameController,
-                        validator: Validators.validateUsername,
+                        validator: Validators.validateUsername, // ✅ Use here
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTextField(
+                        label: "Email",
+                        icon: Icons.email_outlined,
+                        controller: emailController,
+                        validator: Validators.validateEmail,
                       ),
                       const SizedBox(height: 16),
                       _buildTextField(
@@ -140,9 +184,48 @@ class _LoginPageState extends State<LoginPage> {
                         toggleObscure: _obscurePassword,
                         validator: Validators.validatePassword,
                       ),
+                      const SizedBox(height: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildPasswordRequirement(
+                            "At least 8 characters",
+                            hasMinLength,
+                          ),
+                          _buildPasswordRequirement(
+                            "At least 1 uppercase letter",
+                            hasUpperCase,
+                          ),
+                          _buildPasswordRequirement(
+                            "At least 1 number",
+                            hasNumber,
+                          ),
+                          _buildPasswordRequirement(
+                            "At least 1 special character",
+                            hasSpecialChar,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTextField(
+                        label: "Confirm Password",
+                        icon: Icons.lock_outline,
+                        controller: confirmPasswordController,
+                        isPassword: true,
+                        toggleObscure: _obscureConfirmPassword,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Confirm password is required";
+                          }
+                          if (value != passwordController.text) {
+                            return "Passwords do not match";
+                          }
+                          return null;
+                        },
+                      ),
                       const SizedBox(height: 20),
                       ElevatedButton(
-                        onPressed: handleLogin,
+                        onPressed: handleRegister,
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.all(14),
                           shape: RoundedRectangleBorder(
@@ -151,27 +234,19 @@ class _LoginPageState extends State<LoginPage> {
                           backgroundColor: Colors.deepPurple,
                         ),
                         child: const Text(
-                          "Login",
+                          "Register",
                           style: TextStyle(fontSize: 18),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () =>
-                            Navigator.pushNamed(context, '/forgot'),
-                        child: const Text(
-                          "Forgot Password?",
-                          style: TextStyle(color: Colors.deepPurple),
                         ),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text("Don't have an account?"),
+                          const Text("Already have an account?"),
                           TextButton(
                             onPressed: () =>
-                                Navigator.pushNamed(context, '/register'),
+                                Navigator.pushNamed(context, '/login'),
                             child: const Text(
-                              "Register",
+                              "Login",
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.deepPurple,
