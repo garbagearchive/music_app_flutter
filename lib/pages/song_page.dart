@@ -5,7 +5,8 @@ import 'package:provider/provider.dart';
 
 class SongPage extends StatelessWidget {
   const SongPage({super.key});
-  //convert secs => mins
+
+  // Convert secs => mins
   String formatTime(Duration duration) {
     String twoDigitSecs = duration.inSeconds
         .remainder(60)
@@ -19,13 +20,18 @@ class SongPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<PlaylistProvider>(
       builder: (context, value, child) {
-        //get playlist
-        final playList = value.playList;
+        final currentSong =
+            value.currentSong ??
+            (value.playList.isNotEmpty && value.currentSongIndex != null
+                ? value.playList[value.currentSongIndex!]
+                : null);
 
-        //get current song
-        final currentSong = playList[value.currentSongIndex ?? 0];
-        //
-        //return song page UI
+        if (currentSong == null) {
+          return const Scaffold(
+            body: Center(child: Text("No song is playing.")),
+          );
+        }
+
         return Scaffold(
           backgroundColor: Theme.of(context).colorScheme.surface,
           body: SafeArea(
@@ -33,28 +39,26 @@ class SongPage extends StatelessWidget {
               padding: const EdgeInsets.only(left: 25, right: 25, bottom: 25),
               child: Column(
                 children: [
-                  // App Bar Row at the top
+                  // App Bar
                   Row(
                     children: [
                       IconButton(
                         onPressed: () => Navigator.pop(context),
                         icon: const Icon(Icons.arrow_back),
                       ),
-                      Expanded(
-                        child: Center(
-                          child: Text(
-                            'NOW PLAYING',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
+                      const Spacer(),
+                      const Text(
+                        'NOW PLAYING',
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      const SizedBox(width: 48), // Balance space
+                      const Spacer(),
+                      const SizedBox(width: 48),
                     ],
                   ),
 
                   const SizedBox(height: 40),
 
-                  // Main content scrollable in case of small screen
+                  // Scrollable content
                   Expanded(
                     child: SingleChildScrollView(
                       child: Column(
@@ -69,8 +73,7 @@ class SongPage extends StatelessWidget {
                                     currentSong.albumImage,
                                     width: 200,
                                     height: 200,
-                                    fit: BoxFit
-                                        .cover, // ensures it fills the box without stretching
+                                    fit: BoxFit.cover,
                                   ),
                                 ),
                                 Padding(
@@ -83,7 +86,7 @@ class SongPage extends StatelessWidget {
                                         children: [
                                           Text(
                                             currentSong.songName,
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 20,
                                             ),
@@ -97,9 +100,10 @@ class SongPage extends StatelessWidget {
                               ],
                             ),
                           ),
+
                           const SizedBox(height: 100),
 
-                          // Duration and slider
+                          // Duration and controls
                           Column(
                             children: [
                               Padding(
@@ -173,7 +177,7 @@ class SongPage extends StatelessWidget {
 
                           const SizedBox(height: 25),
 
-                          // Playback control
+                          // Playback buttons
                           Row(
                             children: [
                               Expanded(

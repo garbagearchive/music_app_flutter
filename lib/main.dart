@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return MaterialApp(
-      title: 'Music Auth App',
+      title: 'Music App',
       debugShowCheckedModeBanner: false,
       theme: themeProvider.themeData,
       initialRoute: '/login',
