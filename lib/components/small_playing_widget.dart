@@ -12,18 +12,21 @@ class NowPlayingWidget extends StatelessWidget {
     return Consumer<PlaylistProvider>(
       builder: (context, provider, child) {
         final songIndex = provider.currentSongIndex;
+        final currentPlaylist = provider.currentPlaylist;
 
-        if (songIndex == null || provider.playList.isEmpty) {
+        if (songIndex == null ||
+            currentPlaylist.isEmpty ||
+            songIndex >= currentPlaylist.length) {
           return const SizedBox.shrink();
         }
 
-        final song = provider.playList[songIndex];
+        final song = currentPlaylist[songIndex];
 
         return Dismissible(
           key: const ValueKey('now-playing-widget'),
-          direction: DismissDirection.startToEnd, // Vuốt từ trái sang phải
+          direction: DismissDirection.startToEnd,
           onDismissed: (direction) {
-            provider.stopPlaying(); // Ngừng nhạc và xóa widget
+            provider.stopPlaying(); // Dừng phát khi vuốt
           },
           background: Container(
             color: Colors.redAccent,
@@ -46,6 +49,7 @@ class NowPlayingWidget extends StatelessWidget {
             ),
             child: Row(
               children: [
+                // Ảnh bài hát
                 ClipRRect(
                   borderRadius: BorderRadius.circular(6),
                   child: Image.asset(
@@ -56,6 +60,7 @@ class NowPlayingWidget extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
+                // Tên bài hát và ca sĩ
                 Expanded(
                   child: GestureDetector(
                     onTap: onTap,
@@ -64,23 +69,24 @@ class NowPlayingWidget extends StatelessWidget {
                       children: [
                         Text(
                           song.songName,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         Text(
                           song.artistName,
-                          style: const TextStyle(
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
                             fontSize: 12,
-                            color: Colors.black54,
-                            overflow: TextOverflow.ellipsis,
+                            color: Colors.grey.shade700,
                           ),
                         ),
                       ],
                     ),
                   ),
                 ),
+                // Nút điều khiển
                 IconButton(
                   icon: const Icon(Icons.skip_previous),
                   onPressed: provider.playPreviousSong,
