@@ -91,6 +91,7 @@ class _MusicSearchScreenState extends State<MusicSearchScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('SEARCH')),
+
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),

@@ -187,16 +187,24 @@ class PlaylistProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  //pause or resume
   void pauseOrResume() {
-    _isPlaying ? pause() : resume();
+    if (_isPlaying) {
+      pause();
+    } else {
+      resume();
+    }
   }
 
+//stop playing
   void stopPlaying() {
     _audioPlayer.stop();
     _isPlaying = false;
     _currentSongIndex = null;
     notifyListeners();
-  }
+}
+
+  //find a specific timestamp
 
   void seek(Duration position) async {
     await _audioPlayer.seek(position);
