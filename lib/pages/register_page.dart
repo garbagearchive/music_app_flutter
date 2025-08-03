@@ -50,12 +50,10 @@ class _RegisterPageState extends State<RegisterPage> {
         passwordController.text.trim(),
       );
       ScaffoldMessenger.of(
-        // ignore: use_build_context_synchronously
         context,
       ).showSnackBar(SnackBar(content: Text(message)));
     } catch (e) {
       ScaffoldMessenger.of(
-        // ignore: use_build_context_synchronously
         context,
       ).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
@@ -69,6 +67,8 @@ class _RegisterPageState extends State<RegisterPage> {
     ValueNotifier<bool>? toggleObscure,
     String? Function(String?)? validator,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return ValueListenableBuilder<bool>(
       valueListenable: toggleObscure ?? ValueNotifier(false),
       builder: (context, obscure, _) {
@@ -78,7 +78,8 @@ class _RegisterPageState extends State<RegisterPage> {
           validator: validator,
           decoration: InputDecoration(
             labelText: label,
-            prefixIcon: Icon(icon),
+            labelStyle: TextStyle(color: colorScheme.inversePrimary),
+            prefixIcon: Icon(icon, color: colorScheme.secondary),
             suffixIcon: isPassword
                 ? IconButton(
                     icon: Icon(
@@ -89,7 +90,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   )
                 : null,
             filled: true,
-            fillColor: Colors.grey.shade100,
+            fillColor: colorScheme.surface,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
@@ -122,6 +123,8 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -135,6 +138,7 @@ class _RegisterPageState extends State<RegisterPage> {
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),
             child: Card(
+              color: colorScheme.surface,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -146,19 +150,22 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Text(
+                      Text(
                         "Create Account",
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: colorScheme.inversePrimary,
                         ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 10),
-                      const Text(
+                      Text(
                         "Register to get started",
-                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: colorScheme.secondary,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 30),
@@ -166,7 +173,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         label: "Username",
                         icon: Icons.person_outline,
                         controller: usernameController,
-                        validator: Validators.validateUsername, // ✅ Use here
+                        validator: Validators.validateUsername,
                       ),
                       const SizedBox(height: 16),
                       _buildTextField(
@@ -214,12 +221,10 @@ class _RegisterPageState extends State<RegisterPage> {
                         isPassword: true,
                         toggleObscure: _obscureConfirmPassword,
                         validator: (value) {
-                          if (value == null || value.isEmpty) {
+                          if (value == null || value.isEmpty)
                             return "Confirm password is required";
-                          }
-                          if (value != passwordController.text) {
+                          if (value != passwordController.text)
                             return "Passwords do not match";
-                          }
                           return null;
                         },
                       ),
@@ -241,7 +246,10 @@ class _RegisterPageState extends State<RegisterPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text("Already have an account?"),
+                          Text(
+                            "Already have an account?",
+                            style: TextStyle(color: colorScheme.inversePrimary),
+                          ),
                           TextButton(
                             onPressed: () =>
                                 Navigator.pushNamed(context, '/login'),

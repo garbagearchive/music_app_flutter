@@ -14,11 +14,17 @@ class PlaylistDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final playlistProvider = Provider.of<PlaylistProvider>(context);
+    final colorScheme = Theme.of(context).colorScheme;
 
     if (playlistIndex < 0 ||
         playlistIndex >= playlistProvider.playlists.length) {
-      return const Scaffold(
-        body: Center(child: Text('Playlist does not exist.')),
+      return Scaffold(
+        body: Center(
+          child: Text(
+            'Playlist does not exist.',
+            style: TextStyle(color: colorScheme.inversePrimary),
+          ),
+        ),
       );
     }
 
@@ -26,10 +32,15 @@ class PlaylistDetailPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(playlist.name),
+        title: Text(
+          playlist.name,
+          style: TextStyle(color: colorScheme.inversePrimary),
+        ),
+        backgroundColor: colorScheme.primary,
+        iconTheme: IconThemeData(color: colorScheme.inversePrimary),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: Icon(Icons.add, color: colorScheme.inversePrimary),
             onPressed: () async {
               final selectedSong = await Navigator.push(
                 context,
@@ -43,7 +54,6 @@ class PlaylistDetailPage extends StatelessWidget {
 
               if (selectedSong != null && selectedSong is Song) {
                 playlistProvider.addSongToPlaylist(playlistIndex, selectedSong);
-                // ignore: use_build_context_synchronously
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Added "${selectedSong.songName}"')),
                 );
@@ -63,18 +73,24 @@ class PlaylistDetailPage extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: Text(
                 '${playlist.songs.length} songs',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
+                  color: colorScheme.inversePrimary,
                 ),
               ),
             ),
           ),
 
-          // 🎵 Danh sách bài hát trong playlist
+          // 🎵 Song List
           Expanded(
             child: playlist.songs.isEmpty
-                ? const Center(child: Text('No songs in this playlist.'))
+                ? Center(
+                    child: Text(
+                      'No songs in this playlist.',
+                      style: TextStyle(color: colorScheme.inversePrimary),
+                    ),
+                  )
                 : ListView.builder(
                     itemCount: playlist.songs.length,
                     itemBuilder: (context, index) {
@@ -82,7 +98,7 @@ class PlaylistDetailPage extends StatelessWidget {
                       final isPlaying = playlistProvider.currentSong == song;
 
                       return Container(
-                        color: isPlaying ? Colors.grey.shade200 : null,
+                        color: isPlaying ? colorScheme.primary : null,
                         child: ListTile(
                           leading: Stack(
                             alignment: Alignment.center,
@@ -93,34 +109,43 @@ class PlaylistDetailPage extends StatelessWidget {
                                 height: 50,
                               ),
                               if (isPlaying)
-                                const Icon(
+                                Icon(
                                   Icons.music_note,
-                                  color: Colors.blue,
+                                  color: colorScheme.secondary,
                                 ),
                             ],
                           ),
-                          title: Text(song.songName),
-                          subtitle: Text(song.artistName),
+                          title: Text(
+                            song.songName,
+                            style: TextStyle(color: colorScheme.inversePrimary),
+                          ),
+                          subtitle: Text(
+                            song.artistName,
+                            style: TextStyle(color: colorScheme.secondary),
+                          ),
                           onTap: () {
                             final messenger = ScaffoldMessenger.of(context);
-                            final playlistProvider = Provider.of<PlaylistProvider>(context, listen: false);
+                            final playlistProvider =
+                                Provider.of<PlaylistProvider>(
+                                  context,
+                                  listen: false,
+                                );
                             playlistProvider.setPlaylist(playlist.songs);
                             playlistProvider.playSong(song);
 
-                            // Show SnackBar sau khi frame hiện xong
                             WidgetsBinding.instance.addPostFrameCallback((_) {
                               messenger.showSnackBar(
                                 SnackBar(
-                                  content: const Text(
+                                  content: Text(
                                     '🎵 Now Playing...',
                                     style: TextStyle(
-                                      color: Colors.white,
+                                      color: colorScheme.surface,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                   duration: const Duration(seconds: 1),
                                   behavior: SnackBarBehavior.floating,
-                                  backgroundColor: const Color(0xFF6A1B9A),
+                                  backgroundColor: colorScheme.inversePrimary,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
@@ -130,12 +155,10 @@ class PlaylistDetailPage extends StatelessWidget {
                               );
                             });
 
-                            // Delay trước khi chuyển trang để SnackBar kịp hiển thị
                             Future.delayed(
                               const Duration(milliseconds: 600),
                               () {
                                 Navigator.push(
-                                  // ignore: use_build_context_synchronously
                                   context,
                                   MaterialPageRoute(
                                     builder: (_) => const SongPage(),
@@ -144,15 +167,16 @@ class PlaylistDetailPage extends StatelessWidget {
                               },
                             );
                           },
-
                           trailing: IconButton(
-                            icon: const Icon(Icons.delete),
+                            icon: Icon(
+                              Icons.delete,
+                              color: colorScheme.inversePrimary,
+                            ),
                             onPressed: () {
                               playlistProvider.removeSongFromPlaylist(
                                 playlistIndex,
                                 song,
                               );
-
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text('Removed "${song.songName}"'),

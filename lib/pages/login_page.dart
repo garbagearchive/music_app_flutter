@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:music_app/pages/home_page.dart';
 import '../utils/validators.dart';
 import '../services/api_service.dart';
-//import 'home_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -25,10 +24,8 @@ class _LoginPageState extends State<LoginPage> {
       passwordController.text.trim(),
     );
 
-    // If successful login message
     if (message.toLowerCase().contains("success")) {
       Navigator.pushReplacement(
-        // ignore: use_build_context_synchronously
         context,
         MaterialPageRoute(
           builder: (context) =>
@@ -36,9 +33,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
     } else {
-      // Otherwise show error message
       ScaffoldMessenger.of(
-        // ignore: use_build_context_synchronously
         context,
       ).showSnackBar(SnackBar(content: Text(message)));
     }
@@ -52,6 +47,8 @@ class _LoginPageState extends State<LoginPage> {
     ValueNotifier<bool>? toggleObscure,
     String? Function(String?)? validator,
   }) {
+    final theme = Theme.of(context);
+
     return ValueListenableBuilder<bool>(
       valueListenable: toggleObscure ?? ValueNotifier(false),
       builder: (context, obscure, _) {
@@ -59,9 +56,11 @@ class _LoginPageState extends State<LoginPage> {
           controller: controller,
           obscureText: isPassword ? obscure : false,
           validator: validator,
+          style: TextStyle(color: theme.colorScheme.inversePrimary),
           decoration: InputDecoration(
             labelText: label,
-            prefixIcon: Icon(icon),
+            labelStyle: TextStyle(color: theme.colorScheme.inversePrimary),
+            prefixIcon: Icon(icon, color: theme.colorScheme.inversePrimary),
             suffixIcon: isPassword
                 ? IconButton(
                     icon: Icon(
@@ -72,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
                   )
                 : null,
             filled: true,
-            fillColor: Colors.grey.shade100,
+            fillColor: theme.colorScheme.surface,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
@@ -85,6 +84,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -98,6 +99,7 @@ class _LoginPageState extends State<LoginPage> {
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),
             child: Card(
+              color: theme.colorScheme.surface,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -109,19 +111,22 @@ class _LoginPageState extends State<LoginPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Text(
+                      Text(
                         "Welcome Back",
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: theme.colorScheme.inversePrimary,
                         ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 10),
-                      const Text(
+                      Text(
                         "Login to your account",
-                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: theme.colorScheme.secondary,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 30),
@@ -149,6 +154,7 @@ class _LoginPageState extends State<LoginPage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           backgroundColor: Colors.deepPurple,
+                          foregroundColor: Colors.white,
                         ),
                         child: const Text(
                           "Login",
@@ -158,23 +164,30 @@ class _LoginPageState extends State<LoginPage> {
                       TextButton(
                         onPressed: () =>
                             Navigator.pushNamed(context, '/forgot'),
-                        child: const Text(
+                        child: Text(
                           "Forgot Password?",
-                          style: TextStyle(color: Colors.deepPurple),
+                          style: TextStyle(
+                            color: theme.colorScheme.inversePrimary,
+                          ),
                         ),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text("Don't have an account?"),
+                          Text(
+                            "Don't have an account?",
+                            style: TextStyle(
+                              color: theme.colorScheme.secondary,
+                            ),
+                          ),
                           TextButton(
                             onPressed: () =>
                                 Navigator.pushNamed(context, '/register'),
-                            child: const Text(
+                            child: Text(
                               "Register",
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: Colors.deepPurple,
+                                color: theme.colorScheme.inversePrimary,
                               ),
                             ),
                           ),

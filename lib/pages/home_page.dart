@@ -26,8 +26,6 @@ class _HomePageState extends State<HomePage> {
   late final PlaylistProvider playListProvider;
   int _selectedIndex = 0;
 
-  Null get isPlaying => null;
-
   @override
   void initState() {
     super.initState();
@@ -44,10 +42,15 @@ class _HomePageState extends State<HomePage> {
     final nameController = TextEditingController();
     Uint8List? imageData;
 
+    final colorScheme = Theme.of(context).colorScheme;
+
     await showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Create Playlist'),
+        title: Text(
+          'Create Playlist',
+          style: TextStyle(color: colorScheme.inversePrimary),
+        ),
         content: StatefulBuilder(
           builder: (context, setState) => Column(
             mainAxisSize: MainAxisSize.min,
@@ -89,17 +92,14 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         actions: [
-          // Cancel button with border and black text
           OutlinedButton(
             onPressed: () => Navigator.pop(context),
             style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: Colors.black),
-              foregroundColor: Colors.black,
+              side: BorderSide(color: colorScheme.inversePrimary),
+              foregroundColor: colorScheme.inversePrimary,
             ),
             child: const Text('Cancel'),
           ),
-
-          // Create button with black text
           ElevatedButton(
             onPressed: () {
               final name = nameController.text.trim();
@@ -107,12 +107,10 @@ class _HomePageState extends State<HomePage> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Please enter a playlist name.'),
-                    behavior: SnackBarBehavior.floating,
                   ),
                 );
                 return;
               }
-
               Provider.of<PlaylistProvider>(
                 context,
                 listen: false,
@@ -120,8 +118,8 @@ class _HomePageState extends State<HomePage> {
               Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.grey[200], // light background
-              foregroundColor: Colors.black, // black text
+              backgroundColor: colorScheme.surface,
+              foregroundColor: colorScheme.inversePrimary,
             ),
             child: const Text('Create'),
           ),
@@ -139,10 +137,15 @@ class _HomePageState extends State<HomePage> {
     final nameController = TextEditingController(text: currentName);
     Uint8List? imageData = currentImage;
 
+    final colorScheme = Theme.of(context).colorScheme;
+
     await showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Edit Playlist'),
+        title: Text(
+          'Edit Playlist',
+          style: TextStyle(color: colorScheme.inversePrimary),
+        ),
         content: StatefulBuilder(
           builder: (context, setState) => Column(
             mainAxisSize: MainAxisSize.min,
@@ -184,17 +187,14 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         actions: [
-          // Nút Cancel với viền rõ ràng
           OutlinedButton(
             onPressed: () => Navigator.pop(context),
             style: OutlinedButton.styleFrom(
-              side: BorderSide(color: Colors.black), // viền đen
-              foregroundColor: Colors.black, // màu chữ đen
+              side: BorderSide(color: colorScheme.inversePrimary),
+              foregroundColor: colorScheme.inversePrimary,
             ),
             child: const Text('Cancel'),
           ),
-
-          // Nút Save với chữ đen
           ElevatedButton(
             onPressed: () {
               if (nameController.text.isNotEmpty) {
@@ -206,8 +206,8 @@ class _HomePageState extends State<HomePage> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.grey[200], // hoặc white
-              foregroundColor: Colors.black, // chữ đen
+              backgroundColor: colorScheme.surface,
+              foregroundColor: colorScheme.inversePrimary,
             ),
             child: const Text('Save'),
           ),
@@ -217,6 +217,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _getBody() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     switch (_selectedIndex) {
       case 0:
         return Consumer<PlaylistProvider>(
@@ -227,9 +229,12 @@ class _HomePageState extends State<HomePage> {
             return ListView(
               children: [
                 ListTile(
-                  title: const Text(
+                  title: Text(
                     'YOUR PLAYLISTS',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.inversePrimary,
+                    ),
                   ),
                   trailing: IconButton(
                     icon: const Icon(Icons.add),
@@ -283,9 +288,12 @@ class _HomePageState extends State<HomePage> {
                 }),
                 const Divider(),
                 ListTile(
-                  title: const Text(
+                  title: Text(
                     'ALL SONGS',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.inversePrimary,
+                    ),
                   ),
                 ),
                 ...List.generate(playList.length, (index) {
@@ -313,18 +321,16 @@ class _HomePageState extends State<HomePage> {
                     ),
                     onTap: () {
                       final messenger = ScaffoldMessenger.of(context);
-                      value.setPlaylist(
-                        playList,
-                      ); // ← Nếu đang ở playlist detail
+                      value.setPlaylist(playList);
                       value.playSong(song);
 
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         messenger.showSnackBar(
                           SnackBar(
-                            content: const Text(
+                            content: Text(
                               '🎵 Now Playing...',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: colorScheme.onPrimary,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -342,7 +348,6 @@ class _HomePageState extends State<HomePage> {
 
                       Future.delayed(const Duration(milliseconds: 600), () {
                         Navigator.push(
-                          // ignore: use_build_context_synchronously
                           context,
                           MaterialPageRoute(builder: (_) => const SongPage()),
                         );
@@ -367,8 +372,10 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: colorScheme.surface,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
         child: Container(
@@ -404,9 +411,7 @@ class _HomePageState extends State<HomePage> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => const SongPage(),
-                          ),
+                          MaterialPageRoute(builder: (_) => const SongPage()),
                         );
                       },
                     )
@@ -419,52 +424,21 @@ class _HomePageState extends State<HomePage> {
         currentIndex: _selectedIndex,
         onTap: _onBottomNavTap,
         type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.black,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.grey,
+        backgroundColor: colorScheme.primary,
+        selectedItemColor: colorScheme.onPrimary,
+        unselectedItemColor: colorScheme.secondary,
         items: [
+          BottomNavigationBarItem(icon: const Icon(Icons.home), label: 'HOME'),
           BottomNavigationBarItem(
-            icon: ShaderMask(
-              shaderCallback: (bounds) => const LinearGradient(
-                colors: [Color(0xFF00FFFF), Color(0xFFFF00FF)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ).createShader(bounds),
-              child: const Icon(Icons.home, color: Colors.white),
-            ),
-            label: 'HOME',
-          ),
-          BottomNavigationBarItem(
-            icon: ShaderMask(
-              shaderCallback: (bounds) => const LinearGradient(
-                colors: [Color(0xFF00FFFF), Color(0xFFFF00FF)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ).createShader(bounds),
-              child: const Icon(Icons.search, color: Colors.white),
-            ),
+            icon: const Icon(Icons.search),
             label: 'SEARCH',
           ),
           BottomNavigationBarItem(
-            icon: ShaderMask(
-              shaderCallback: (bounds) => const LinearGradient(
-                colors: [Color(0xFF00FFFF), Color(0xFFFF00FF)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ).createShader(bounds),
-              child: const Icon(Icons.settings, color: Colors.white),
-            ),
+            icon: const Icon(Icons.settings),
             label: 'SETTINGS',
           ),
           BottomNavigationBarItem(
-            icon: ShaderMask(
-              shaderCallback: (bounds) => const LinearGradient(
-                colors: [Color(0xFF00FFFF), Color(0xFFFF00FF)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ).createShader(bounds),
-              child: const Icon(Icons.contacts, color: Colors.white),
-            ),
+            icon: const Icon(Icons.contacts),
             label: 'ACCOUNT',
           ),
         ],

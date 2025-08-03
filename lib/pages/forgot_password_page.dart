@@ -21,6 +21,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -34,7 +36,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),
             child: Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
               elevation: 8,
               child: Padding(
                 padding: const EdgeInsets.all(24),
@@ -43,19 +47,22 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Text(
+                      Text(
                         "Forgot Password",
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: colorScheme.inversePrimary,
                         ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 10),
-                      const Text(
+                      Text(
                         "Enter your email to reset your password",
-                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: colorScheme.secondary,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 30),
@@ -64,14 +71,18 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         validator: Validators.validateEmail,
                         decoration: InputDecoration(
                           labelText: "Email",
-                          prefixIcon: const Icon(Icons.email_outlined),
+                          prefixIcon: Icon(
+                            Icons.email_outlined,
+                            color: colorScheme.secondary,
+                          ),
                           filled: true,
-                          fillColor: Colors.grey.shade100,
+                          fillColor: colorScheme.surface,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
                           ),
                         ),
+                        style: TextStyle(color: colorScheme.inversePrimary),
                       ),
                       const SizedBox(height: 20),
                       ElevatedButton(
@@ -82,8 +93,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           backgroundColor: Colors.deepPurple,
+                          foregroundColor: Colors.white,
                         ),
-                        child: const Text("Send Reset Link", style: TextStyle(fontSize: 18)),
+                        child: const Text(
+                          "Send Reset Link",
+                          style: TextStyle(fontSize: 18),
+                        ),
                       ),
                       TextButton(
                         onPressed: () => Navigator.pushNamed(context, '/login'),

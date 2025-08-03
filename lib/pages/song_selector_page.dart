@@ -7,16 +7,25 @@ class SongSelectorPage extends StatelessWidget {
   final List<Song> playlistSongs; // các bài hiện có trong playlist
 
   // ignore: non_constant_identifier_names
-  const SongSelectorPage({super.key, required this.playlistSongs, required Null Function(dynamic Song) onSongSelected});
+  const SongSelectorPage({
+    super.key,
+    required this.playlistSongs,
+    required Null Function(dynamic Song) onSongSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
     final allSongs = context.read<PlaylistProvider>().allSongs;
 
     // Lọc ra những bài chưa có trong playlist
-    final availableSongs = allSongs.where((song) =>
-      !playlistSongs.any((s) => s.songName == song.songName && s.artistName == song.artistName)
-    ).toList();
+    final availableSongs = allSongs
+        .where(
+          (song) => !playlistSongs.any(
+            (s) =>
+                s.songName == song.songName && s.artistName == song.artistName,
+          ),
+        )
+        .toList();
 
     return Scaffold(
       appBar: AppBar(title: const Text("Select a song")),

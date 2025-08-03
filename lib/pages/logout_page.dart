@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:music_app/pages/home_page.dart';
-import 'package:music_app/pages/login_page.dart'; // thêm nếu chưa có
-import 'package:shared_preferences/shared_preferences.dart'; // nếu dùng SharedPreferences
+import 'package:music_app/pages/login_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LogoutPage extends StatelessWidget {
   final String username;
@@ -10,55 +10,68 @@ class LogoutPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ignore: deprecated_member_use
+    final colorScheme = Theme.of(context).colorScheme;
+
     return WillPopScope(
-      onWillPop: () async => false, // chặn nút back vật lý
+      onWillPop: () async => false, // prevent physical back button
       child: Scaffold(
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.logout, size: 80, color: Colors.deepPurple),
+              Icon(
+                Icons.logout,
+                size: 80,
+                color: colorScheme.inversePrimary, // replaces deepPurple
+              ),
               const SizedBox(height: 20),
-              const Text("Do you want to logout?", style: TextStyle(fontSize: 20)),
+              Text(
+                "Do you want to logout?",
+                style: TextStyle(
+                  fontSize: 20,
+                  color: colorScheme.inversePrimary, // adapts to theme
+                ),
+              ),
               const SizedBox(height: 30),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Nút YES - Đăng xuất
+                  // YES Button
                   ElevatedButton(
                     onPressed: () async {
-                      // Xóa thông tin đăng nhập nếu có
                       final prefs = await SharedPreferences.getInstance();
                       await prefs.clear();
 
-                      // Điều hướng về LoginPage, xoá hết stack
                       Navigator.pushAndRemoveUntil(
-                        // ignore: use_build_context_synchronously
                         context,
-                        MaterialPageRoute(builder: (context) => const LoginPage()),
+                        MaterialPageRoute(
+                          builder: (context) => const LoginPage(),
+                        ),
                         (route) => false,
                       );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
+                      foregroundColor:
+                          colorScheme.surface, // usually white/black
                     ),
                     child: const Text("Yes"),
                   ),
                   const SizedBox(width: 20),
-                  // Nút NO - Quay lại Home
+                  // NO Button
                   ElevatedButton(
                     onPressed: () {
                       Navigator.pushAndRemoveUntil(
                         context,
-                        MaterialPageRoute(builder: (_) => HomePage(username: username)),
+                        MaterialPageRoute(
+                          builder: (_) => HomePage(username: username),
+                        ),
                         (route) => false,
                       );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
+                      foregroundColor: colorScheme.surface,
                     ),
                     child: const Text("No"),
                   ),

@@ -54,8 +54,17 @@ class _AccountPageState extends State<AccountPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('ACCOUNT')),
+      appBar: AppBar(
+        title: Text(
+          'ACCOUNT',
+          style: TextStyle(color: colorScheme.inversePrimary),
+        ),
+        backgroundColor: colorScheme.primary,
+        iconTheme: IconThemeData(color: colorScheme.inversePrimary),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -68,8 +77,8 @@ class _AccountPageState extends State<AccountPage> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.deepPurple, // 🎨 Màu viền bạn muốn
-                    width: 4.0, // 🧱 Độ dày viền
+                    color: Colors.deepPurple, // Custom border color
+                    width: 4.0,
                   ),
                 ),
                 child: CircleAvatar(
@@ -81,11 +90,10 @@ class _AccountPageState extends State<AccountPage> {
                 ),
               ),
             ),
-
             const SizedBox(height: 20),
             Text(
               'Username: ${widget.username}',
-              style: const TextStyle(fontSize: 18),
+              style: TextStyle(fontSize: 18, color: colorScheme.inversePrimary),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
@@ -98,8 +106,8 @@ class _AccountPageState extends State<AccountPage> {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
+                backgroundColor: colorScheme.error,
+                foregroundColor: colorScheme.onError,
               ),
               child: const Text('Logout'),
             ),
