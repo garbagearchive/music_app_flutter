@@ -203,29 +203,37 @@ class PlaylistProvider extends ChangeNotifier {
   }
 
   void playNextSong() {
+    if (_currentPlaylist.isEmpty) return;
+
     if (_isRepeat) {
-      seek(Duration.zero);
-      play();
+      if (_currentSongIndex != null &&
+          _currentSongIndex! >= 0 &&
+          _currentSongIndex! < _currentPlaylist.length) {
+        playSong(_currentPlaylist[_currentSongIndex!]); // ✅ Lặp lại bài đúng
+      }
     } else if (_isShuffle) {
       final random = Random();
       int nextIndex;
       do {
-        nextIndex = random.nextInt(_playList.length);
-      } while (nextIndex == _currentSongIndex);
+        nextIndex = random.nextInt(_currentPlaylist.length);
+      } while (nextIndex == _currentSongIndex && _currentPlaylist.length > 1);
       currentSongIndex = nextIndex;
     } else {
       if (_currentSongIndex != null) {
-        currentSongIndex = (_currentSongIndex! + 1) % _playList.length;
+        final nextIndex = (_currentSongIndex! + 1) % _currentPlaylist.length;
+        currentSongIndex = nextIndex;
       }
     }
   }
 
   void playPreviousSong() {
+    if (_currentPlaylist.isEmpty) return;
+
     if (_currentDuration.inSeconds > 2) {
       seek(Duration.zero);
     } else {
       if (_currentSongIndex == null || _currentSongIndex == 0) {
-        currentSongIndex = _playList.length - 1;
+        currentSongIndex = _currentPlaylist.length - 1;
       } else {
         currentSongIndex = _currentSongIndex! - 1;
       }
@@ -270,8 +278,8 @@ class PlaylistProvider extends ChangeNotifier {
   // Setter
   set currentSongIndex(int? newIndex) {
     _currentSongIndex = newIndex;
-    if (newIndex != null) {
-      play();
+    if (newIndex != null && _currentPlaylist.isNotEmpty) {
+      playSong(_currentPlaylist[newIndex]);
     }
     notifyListeners();
   }
@@ -285,24 +293,27 @@ class PlaylistProvider extends ChangeNotifier {
   Song? get currentSong => _currentSong;
 
   void setPlaylist(List<Song> songs) {
-    _currentPlaylist = songs;
+    _currentPlaylist = List.from(songs);
+    // ❌ Không set _currentSongIndex ở đây
     notifyListeners();
   }
 
   void playSong(Song song) async {
+    _currentPlaylist = _currentPlaylist; // giữ nguyên nếu đã set rồi trước đó
     _currentSong = song;
-    _currentSongIndex = _currentPlaylist.indexOf(song);
+    _currentSongIndex = _currentPlaylist.indexOf(song); // ✅ đặt đúng vị trí bài hát
+
+    if (_currentSongIndex == -1) {
+      // Nếu bài hát không có trong danh sách, thêm vào đầu
+      _currentPlaylist.insert(0, song);
+      _currentSongIndex = 0;
+    }
+
     await _audioPlayer.stop();
     await _audioPlayer.play(AssetSource(song.audioPath));
-    _isPlaying = true;
-    notifyListeners();
-  }
 
-  void shufflePlaylist() {
-    if (_currentPlaylist.isEmpty) return;
-    _currentPlaylist.shuffle();
-    _currentSongIndex = 0;
-    notifyListeners();
+    _isPlaying = true;
+    notifyListeners(); // 🔁 BẮT BUỘC để cập nhật UI
   }
 
   void playCurrentSong() {
