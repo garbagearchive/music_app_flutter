@@ -26,37 +26,12 @@ class _HomePageState extends State<HomePage> {
   late final PlaylistProvider playListProvider;
   int _selectedIndex = 0;
 
+  Null get isPlaying => null;
+
   @override
   void initState() {
     super.initState();
     playListProvider = Provider.of<PlaylistProvider>(context, listen: false);
-  }
-
-  void goToSong(int songIndex) {
-    playListProvider.currentSongIndex = songIndex;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text(
-          '🎵 Now Playing...',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        duration: const Duration(seconds: 1),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: const Color(0xFF6A1B9A),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.all(16),
-        elevation: 10,
-      ),
-    );
-
-    Future.delayed(const Duration(milliseconds: 300), () {
-      Navigator.push(
-        // ignore: use_build_context_synchronously
-        context,
-        MaterialPageRoute(builder: (context) => const SongPage()),
-      );
-    });
   }
 
   void _onBottomNavTap(int index) {
@@ -273,6 +248,7 @@ class _HomePageState extends State<HomePage> {
                           : null,
                     ),
                     title: Text(playlist.name),
+                    subtitle: Text('${playlist.songs.length} songs'),
                     trailing: PopupMenuButton<String>(
                       onSelected: (value) {
                         if (value == 'edit') {
@@ -314,11 +290,64 @@ class _HomePageState extends State<HomePage> {
                 ),
                 ...List.generate(playList.length, (index) {
                   final song = playList[index];
+                  final isPlaying = song == value.currentSong;
+
                   return ListTile(
                     title: Text(song.songName),
                     subtitle: Text(song.artistName),
-                    leading: Image.asset(song.albumImage),
-                    onTap: () => goToSong(index),
+                    leading: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Image.asset(song.albumImage),
+                        if (isPlaying)
+                          const Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: Icon(
+                              Icons.music_note,
+                              color: Colors.blue,
+                              size: 20,
+                            ),
+                          ),
+                      ],
+                    ),
+                    onTap: () {
+                      final messenger = ScaffoldMessenger.of(context);
+                      value.setPlaylist(
+                        playList,
+                      ); // ← Nếu đang ở playlist detail
+                      value.playSong(song);
+
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: const Text(
+                              '🎵 Now Playing...',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            duration: const Duration(seconds: 1),
+                            behavior: SnackBarBehavior.floating,
+                            backgroundColor: const Color(0xFF6A1B9A),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            margin: const EdgeInsets.all(16),
+                            elevation: 10,
+                          ),
+                        );
+                      });
+
+                      Future.delayed(const Duration(milliseconds: 600), () {
+                        Navigator.push(
+                          // ignore: use_build_context_synchronously
+                          context,
+                          MaterialPageRoute(builder: (_) => const SongPage()),
+                        );
+                      });
+                    },
                   );
                 }),
               ],
