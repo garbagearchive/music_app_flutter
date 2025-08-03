@@ -17,7 +17,10 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_facebook_auth: ^6.1.1
   intl: ^0.18.0
-
+  image_picker: ^1.1.2
+  shared_preferences: ^2.5.3
+  http: ^1.4.0
+  file_picker: ^10.2.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

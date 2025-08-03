@@ -1,21 +1,55 @@
 import 'dart:math';
-
-import 'package:audioplayers/audioplayers.dart';
+import 'dart:typed_data' show Uint8List;
+// ignore: prefer_typing_uninitialized_variables, strict_top_level_inference, non_constant_identifie'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:music_app/models/songs.dart';
+import 'package:audioplayers/audioplayers.dart';
 
-//this file for playlist
+import 'songs.dart';
+import 'playlist.dart';
+
 class PlaylistProvider extends ChangeNotifier {
+  // ============ PLAYLIST DO NGƯỜI DÙNG TẠO ============
+  final List<Playlist> _playlists = [];
+
+  List<Playlist> get playlists => _playlists;
+
+  void addPlaylist(String name, Uint8List? image) {
+    _playlists.add(
+      Playlist(name: name, image: image, songs: []),
+    ); // ok nếu constructor đã an toàn
+    notifyListeners();
+  }
+
+  void updatePlaylist(int index, String name, Uint8List? image) {
+    _playlists[index].name = name;
+    _playlists[index].image = image;
+    notifyListeners();
+  }
+
+  void deletePlaylist(int index) {
+    _playlists.removeAt(index);
+    notifyListeners();
+  }
+
+  void addSongToPlaylist(int index, Song song) {
+    _playlists[index].songs.add(song);
+    notifyListeners();
+  }
+
+  void removeSongFromPlaylist(int index, Song song) {
+    _playlists[index].songs.remove(song);
+    notifyListeners();
+  }
+
+  // ============ DANH SÁCH BÀI HÁT + PHÁT NHẠC ============
   final List<Song> _playList = [
-    //index 0
     Song(
       songName: 'Calm',
       artistName: 'Cursedsnake',
       albumImage: 'assets/images/calm.png',
       audioPath: 'audio/Calm.mp3',
-      genre: 'EDM', // Thể loại mới
+      genre: 'EDM',
     ),
-    //index 1
     Song(
       songName: 'Feel',
       artistName: '8bitPice',
@@ -23,7 +57,6 @@ class PlaylistProvider extends ChangeNotifier {
       audioPath: 'audio/Feel.mp3',
       genre: 'EDM',
     ),
-    //2
     Song(
       songName: 'Unity',
       artistName: 'TheFatRat',
@@ -31,7 +64,6 @@ class PlaylistProvider extends ChangeNotifier {
       audioPath: 'audio/Unity.mp3',
       genre: 'EDM',
     ),
-    //3
     Song(
       songName: 'Invisible',
       artistName: 'Duran Duran',
@@ -39,7 +71,6 @@ class PlaylistProvider extends ChangeNotifier {
       audioPath: 'audio/Invisible.mp3',
       genre: 'Pop',
     ),
-    //4
     Song(
       songName: 'Blinding Lights',
       artistName: 'The Weeknd',
@@ -47,7 +78,6 @@ class PlaylistProvider extends ChangeNotifier {
       audioPath: 'audio/BlindingLights.mp3',
       genre: 'Synthwave',
     ),
-    //5
     Song(
       songName: 'Bohemian Rhapsody',
       artistName: 'Queen',
@@ -55,7 +85,6 @@ class PlaylistProvider extends ChangeNotifier {
       audioPath: 'audio/BohemianRhapsody.mp3',
       genre: 'Rock',
     ),
-    //6
     Song(
       songName: 'Stay',
       artistName: 'The Kid LAROI & Justin Bieber',
@@ -63,7 +92,6 @@ class PlaylistProvider extends ChangeNotifier {
       audioPath: 'audio/Stay.mp3',
       genre: 'Pop',
     ),
-    //7
     Song(
       songName: 'Uptown Funk',
       artistName: 'Mark Ronson ft. Bruno Mars',
@@ -71,7 +99,6 @@ class PlaylistProvider extends ChangeNotifier {
       audioPath: 'audio/UptownFunk.mp3',
       genre: 'Funk/Pop',
     ),
-    //8
     Song(
       songName: 'Cake by the ocean',
       artistName: 'DNCE',
@@ -79,8 +106,6 @@ class PlaylistProvider extends ChangeNotifier {
       audioPath: 'audio/CakeByTheOcean.mp3',
       genre: 'Pop',
     ),
-
-    //9
     Song(
       songName: 'Blowin’ in the Wind',
       artistName: 'Bob Dylan',
@@ -88,8 +113,6 @@ class PlaylistProvider extends ChangeNotifier {
       audioPath: 'audio/BlowinInTheWind.mp3',
       genre: 'Folk',
     ),
-
-    //10
     Song(
       songName: 'Can’t Stop the Feeling!',
       artistName: 'Justin Timberlake',
@@ -97,8 +120,6 @@ class PlaylistProvider extends ChangeNotifier {
       audioPath: 'audio/CantStopTheFeeling.mp3',
       genre: 'Pop',
     ),
-
-    //11
     Song(
       songName: 'Thunderstruck',
       artistName: 'AC/DC',
@@ -106,7 +127,6 @@ class PlaylistProvider extends ChangeNotifier {
       audioPath: 'audio/Thunderstruck.mp3',
       genre: 'Hard Rock',
     ),
-    //12
     Song(
       songName: 'Counting Stars',
       artistName: 'OneRepublic',
@@ -114,7 +134,6 @@ class PlaylistProvider extends ChangeNotifier {
       audioPath: 'audio/CountingStars.mp3',
       genre: 'Pop Rock',
     ),
-    //13
     Song(
       songName: 'Lovely',
       artistName: 'Billie Eilish & Khalid',
@@ -122,7 +141,6 @@ class PlaylistProvider extends ChangeNotifier {
       audioPath: 'audio/Lovely.mp3',
       genre: 'Indie Pop',
     ),
-    //14
     Song(
       songName: 'Africa',
       artistName: 'Toto',
@@ -131,42 +149,38 @@ class PlaylistProvider extends ChangeNotifier {
       genre: 'Soft Rock',
     ),
   ];
-  /*AUDIOPLAYER 
-  use $flutter pub add audioplayers*/
+  List<Song> get allSongs => _playList; // tất cả bài hát có sẵn
 
-  //audio player
   final AudioPlayer _audioPlayer = AudioPlayer();
-  //duration control
   Duration _currentDuration = Duration.zero;
   Duration _totalDuration = Duration.zero;
 
-  //constructor
+  bool _isPlaying = false;
+  bool _isShuffle = false;
+  bool _isRepeat = false;
+  int? _currentSongIndex;
+
   PlaylistProvider() {
     listenToDuration();
   }
 
-  //when not playing
-  bool _isPlaying = false;
-  bool _isShuffle = false;
-  bool _isRepeat = false;
-
-  //when playing
+  // Audio Controls
   void play() async {
-    final String path = _playList[_currentSongIndex!].audioPath;
+    if (_currentSongIndex == null) return;
     await _audioPlayer.stop();
-    await _audioPlayer.play(AssetSource(path));
+    await _audioPlayer.play(
+      AssetSource(_playList[_currentSongIndex!].audioPath),
+    );
     _isPlaying = true;
     notifyListeners();
   }
 
-  //pausing
   void pause() async {
     await _audioPlayer.pause();
     _isPlaying = false;
     notifyListeners();
   }
 
-  //resume
   void resume() async {
     await _audioPlayer.resume();
     _isPlaying = true;
@@ -191,17 +205,16 @@ class PlaylistProvider extends ChangeNotifier {
 }
 
   //find a specific timestamp
+
   void seek(Duration position) async {
     await _audioPlayer.seek(position);
   }
 
   void playNextSong() {
     if (_isRepeat) {
-      // Repeat current song
       seek(Duration.zero);
       play();
     } else if (_isShuffle) {
-      // Play a random song (not the same as current)
       final random = Random();
       int nextIndex;
       do {
@@ -209,26 +222,20 @@ class PlaylistProvider extends ChangeNotifier {
       } while (nextIndex == _currentSongIndex);
       currentSongIndex = nextIndex;
     } else {
-      // Play next song normally
       if (_currentSongIndex != null) {
-        if (_currentSongIndex! < _playList.length - 1) {
-          currentSongIndex = _currentSongIndex! + 1;
-        } else {
-          currentSongIndex = 0; // loop back to first song
-        }
+        currentSongIndex = (_currentSongIndex! + 1) % _playList.length;
       }
     }
   }
 
-  //play previous song
   void playPreviousSong() {
     if (_currentDuration.inSeconds > 2) {
       seek(Duration.zero);
     } else {
-      if (_currentSongIndex! > 0) {
-        currentSongIndex = currentSongIndex! - 1;
-      } else {
+      if (_currentSongIndex == null || _currentSongIndex == 0) {
         currentSongIndex = _playList.length - 1;
+      } else {
+        currentSongIndex = _currentSongIndex! - 1;
       }
     }
   }
@@ -243,29 +250,23 @@ class PlaylistProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  //listen to duration
   void listenToDuration() {
-    //listen to total
     _audioPlayer.onDurationChanged.listen((newDuration) {
       _totalDuration = newDuration;
       notifyListeners();
     });
-    //listen to current
+
     _audioPlayer.onPositionChanged.listen((newPosition) {
       _currentDuration = newPosition;
       notifyListeners();
     });
 
-    //listen to end
     _audioPlayer.onPlayerComplete.listen((event) {
       playNextSong();
     });
   }
 
-  //dispose audio player
-
-  int? _currentSongIndex;
-  /*G E T T E R*/
+  // Getters
   List<Song> get playList => _playList;
   int? get currentSongIndex => _currentSongIndex;
   bool get isPlaying => _isPlaying;
@@ -274,14 +275,47 @@ class PlaylistProvider extends ChangeNotifier {
   Duration get currentDuration => _currentDuration;
   Duration get totalDuration => _totalDuration;
 
-  /*S E T T E R*/
+  // Setter
   set currentSongIndex(int? newIndex) {
-    //update the index of current song ofc
     _currentSongIndex = newIndex;
     if (newIndex != null) {
       play();
     }
-    //update the UI
     notifyListeners();
+  }
+
+  // ====================== PHÁT NHẠC TỪ PLAYLIST TÙY CHỌN ======================
+
+  List<Song> _currentPlaylist = [];
+  Song? _currentSong;
+
+  List<Song> get currentPlaylist => _currentPlaylist;
+  Song? get currentSong => _currentSong;
+
+  void setPlaylist(List<Song> songs) {
+    _currentPlaylist = songs;
+    notifyListeners();
+  }
+
+  void playSong(Song song) async {
+    _currentSong = song;
+    _currentSongIndex = _currentPlaylist.indexOf(song);
+    await _audioPlayer.stop();
+    await _audioPlayer.play(AssetSource(song.audioPath));
+    _isPlaying = true;
+    notifyListeners();
+  }
+
+  void shufflePlaylist() {
+    if (_currentPlaylist.isEmpty) return;
+    _currentPlaylist.shuffle();
+    _currentSongIndex = 0;
+    notifyListeners();
+  }
+
+  void playCurrentSong() {
+    if (_currentPlaylist.isNotEmpty) {
+      playSong(_currentPlaylist[_currentSongIndex ?? 0]);
+    }
   }
 }

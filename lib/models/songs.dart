@@ -4,7 +4,10 @@ class Song {
   final String artistName;
   final String albumImage;
   final String audioPath;
-  final String genre; // <--- THÊM TRƯỜNG NÀY
+  final String genre;
+
+  // ignore: prefer_typing_uninitialized_variables, strict_top_level_inference
+  static var songs; // <--- THÊM TRƯỜNG NÀY
   //final String songAlbum;
   //final String songLyrics; (?)
 
@@ -18,5 +21,7 @@ class Song {
     //required this.songLyrics;
   });
 }
+
+
 
 //maybe an Artist class here
